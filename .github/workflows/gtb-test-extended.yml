@@ -1,0 +1,27 @@
+name: Gtb test extended
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+      - name: Build with Gradle
+        run: |
+          cat settings.gradle | grep 'rootProject.name' > settings.gradle.bak
+          mv settings.gradle.bak settings.gradle
+          ./gradlew clean build test --tests *ExtendedTest
+      - if: ${{ always() }}
+        run: |
+          PROJECT_NAME=$(echo ${{ github.repository }} | cut -d/ -f2)
+          RESULT=$(cat build/reports/tests/test/index.html | grep -A2 "id=\"successRate\"" | grep "class=\"percent\"" | grep -Eo '[0-9]+([.][0-9]+)?')
+          curl -X POST "${{ secrets.DASHBOARD_ADDRESS }}/terms/${{ secrets.STUDENT_TERM }}/submissions/extend-test?assignmentKey=${PROJECT_NAME}&gtbUsername=${{ secrets.STUDENT_NAME }}" \
+              -H "Content-Type: application/json" \
+              -u "user:${{ secrets.SONAR_TOKEN }}" \
+              -d "${RESULT}"
+
+

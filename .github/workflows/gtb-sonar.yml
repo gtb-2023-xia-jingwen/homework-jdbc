@@ -1,0 +1,50 @@
+name: gtb sonar
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  sonar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: prepare gradle env
+        run: |
+          cat settings.gradle | grep 'rootProject.name' > settings.gradle.bak
+          mv settings.gradle.bak settings.gradle
+          mkdir ~/.gradle && touch ~/.gradle/gradle.properties
+          {
+            echo "systemProp.gtb.sonar.host.url=${{ secrets.SONAR_ADDRESS }}"
+            echo "systemProp.gtb.sonar.login=${{ secrets.SONAR_TOKEN }}"
+            echo "systemProp.gtb.sonar.student.term=${{ secrets.STUDENT_TERM }}"
+            echo "systemProp.gtb.sonar.student.name=${{ secrets.STUDENT_NAME }}"
+          } > ~/.gradle/gradle.properties
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+      - name: Cache gradle dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Cache sonar scanners
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-sonar-scanners
+        with:
+          path: ~/.sonar
+          key: ${{ runner.os }}-sonar-scanner-${{ env.cache-name }}
+          restore-keys: |
+            ${{ runner.os }}-sonar-scanner-
+      - name: Sonar scan
+        run: |
+          ./gradlew sonarqube -x test
+
+
+
