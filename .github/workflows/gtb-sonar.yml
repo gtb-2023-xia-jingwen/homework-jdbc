@@ -8,7 +8,7 @@ on:
 jobs:
   sonar:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
       - name: prepare gradle env
@@ -35,6 +35,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Cache sonar scanners
+        id: cache-sonar-scanners
         uses: actions/cache@v2
         env:
           cache-name: cache-sonar-scanners
@@ -43,6 +44,15 @@ jobs:
           key: ${{ runner.os }}-sonar-scanner-${{ env.cache-name }}
           restore-keys: |
             ${{ runner.os }}-sonar-scanner-
+      - name: Download sonar scanners
+        if: steps.cache-sonar-scanners.outputs.cache-hit != 'true'
+        uses: actions/checkout@v2
+        with:
+            repository: tws-graduate-program/sonar-scanner
+            path: .sonar
+      - name: Move sonar scanner
+        if: steps.cache-sonar-scanners.outputs.cache-hit != 'true'
+        run: mv .sonar ~
       - name: Sonar scan
         run: |
           ./gradlew sonarqube -x test
