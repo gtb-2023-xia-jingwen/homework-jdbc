@@ -30,8 +30,8 @@ public class DbAssert {
         final ServiceConfiguration configuration = TestDatabaseConfiguration.getConfiguration();
         try (
             final Connection connection = DatabaseConnectionProvider.createConnection(configuration);
-            final DSLContext context = DSL.using(connection, SQLDialect.H2)
         ) {
+            final DSLContext context = DSL.using(connection, SQLDialect.H2);
             return func.apply(connection, context);
         }
     }

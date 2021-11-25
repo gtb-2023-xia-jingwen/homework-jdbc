@@ -1,11 +1,5 @@
 package com.tw.domain;
 
-import com.tw.DatabaseConnectionProvider;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.Optional;
 
 public class TodoItemRepository {
