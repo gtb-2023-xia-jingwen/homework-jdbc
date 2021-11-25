@@ -1,13 +1,12 @@
 plugins {
     id 'java'
     id "jacoco"
-    id "org.sonarqube" version "3.0"
 }
 
 group 'com.tw'
 version '1.0-SNAPSHOT'
 
-sourceCompatibility = 1.11
+sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
     maven { url 'https://maven.aliyun.com/repository/public' }
@@ -18,14 +17,14 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.2'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.2'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.5.2'
-    testImplementation('org.jooq:jooq:3.13.1')
-    testImplementation('org.jooq:jooq-meta:3.13.1')
-    testImplementation('org.jooq:jooq-codegen:3.13.1')
+    testImplementation('org.jooq:jooq:3.15.4')
+    testImplementation('org.jooq:jooq-meta:3.15.4')
+    testImplementation('org.jooq:jooq-codegen:3.15.4')
 
     implementation('com.h2database:h2:1.4.200')
-    implementation('org.flywaydb:flyway-core:6.3.3')
-    implementation('org.slf4j:slf4j-api:1.7.30')
-    implementation('org.slf4j:slf4j-simple:1.7.30')
+    implementation('org.flywaydb:flyway-core:8.0.2')
+    implementation('org.slf4j:slf4j-api:1.7.32')
+    implementation('org.slf4j:slf4j-simple:1.7.32')
 }
 
 test {
@@ -38,15 +37,3 @@ jacocoTestReport {
         xml.enabled true
     }
 }
-
-sonarqube {
-    properties {
-        System.properties.'sonar.host.url' = System.properties.'gtb.sonar.host.url'
-        System.properties.'sonar.login' = System.properties.'gtb.sonar.login'
-        def studentTerm = System.properties.'gtb.sonar.student.term'
-        def studentName = System.properties.'gtb.sonar.student.name'
-        property "sonar.projectKey", "${studentName}:${studentTerm}:${project.name}"
-    }
-}
-
-project.tasks["sonarqube"].dependsOn "jacocoTestReport"
