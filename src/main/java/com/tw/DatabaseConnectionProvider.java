@@ -10,7 +10,6 @@ public class DatabaseConnectionProvider {
     }
 
     public static Connection createConnection(ServiceConfiguration configuration) throws Exception {
-        Class.forName(configuration.getDriver());
         return DriverManager.getConnection(
             configuration.getUri(), configuration.getUsername(), configuration.getPassword());
     }
