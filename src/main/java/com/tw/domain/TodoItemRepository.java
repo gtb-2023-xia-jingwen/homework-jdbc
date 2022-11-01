@@ -24,7 +24,20 @@ public class TodoItemRepository {
         // TODO:
         //   Please implement the method.
         // <-start-
-        throw new RuntimeException("Delete me");
+        Connection conn = getConnection();
+        String insetSql = "INSERT INTO `todo_items` (name) VALUES (?)";
+        PreparedStatement preStat = conn.prepareStatement(insetSql);
+        preStat.setString(1, name);
+        preStat.executeUpdate();
+        String querySql = "SELECT `id` FROM `todo_items` WHERE `name` =  ?";
+        preStat = conn.prepareStatement(querySql);
+        preStat.setString(1, name);
+        ResultSet rs = preStat.executeQuery();
+        Long id = -1L;
+        while (rs.next()) {
+            id = rs.getLong("id");
+        }
+        return id;
         // --end-->
     }
 
