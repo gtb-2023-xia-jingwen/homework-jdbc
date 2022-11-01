@@ -21,7 +21,7 @@ public class TodoItemRepository {
         // TODO:
         //   Please implement the method.
         // <-start-
-        if (null == name) throw new IllegalArgumentException();
+        if (null == name) throw new IllegalArgumentException("Name must be provided.");
         Connection conn = getConnection();
         String insetSql = "INSERT INTO `todo_items` (name) VALUES (?)";
         PreparedStatement preStat = conn.prepareStatement(insetSql);
