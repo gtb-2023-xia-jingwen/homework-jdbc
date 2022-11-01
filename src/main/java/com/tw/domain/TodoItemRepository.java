@@ -50,7 +50,18 @@ public class TodoItemRepository {
         // TODO:
         //   Please implement the method.
         // <-start-
-        throw new RuntimeException("Delete me");
+        Connection con = getConnection();
+        String querySql = "SELECT * FROM `todo_items` WHERE `id` = ?";
+        PreparedStatement preStat = con.prepareStatement(querySql);
+        preStat.setLong(1, id);
+        ResultSet rs = preStat.executeQuery();
+        if(!rs.next()) return false;
+        String updateSql = "UPDATE `todo_items` SET `checked` = ? WHERE `id` = ?";
+        preStat = con.prepareStatement(updateSql);
+        preStat.setBoolean(1, checked);
+        preStat.setLong(2, id);
+        preStat.executeUpdate();
+        return true;
         // --end-->
     }
 
