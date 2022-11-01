@@ -1,10 +1,7 @@
 package com.tw.domain;
 
-import java.io.*;
-import java.net.URLDecoder;
 import java.sql.*;
 import java.util.Optional;
-import java.util.ResourceBundle;
 
 public class TodoItemRepository {
     private final ServiceConfiguration configuration;
