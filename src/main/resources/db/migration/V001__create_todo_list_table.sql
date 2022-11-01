@@ -9,3 +9,9 @@
 --         This column should not be null.
 --     (c) `checked` column. This column is of Boolean type in Java. In SQL, it can be BIT. This column
 --         should not be null. And its default value should be 0(false).
+
+CREATE TABLE `todo_items` (
+    `id` INT AUTO_INCREMENT,
+    `name` VARCHAR(128) NOT NULL,
+    `checked` BIT NOT NULL DEFAULT 0,
+    PRIMARY KEY ( `id` ));
