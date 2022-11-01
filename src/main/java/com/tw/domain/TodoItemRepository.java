@@ -22,27 +22,30 @@ public class TodoItemRepository {
         //   Please implement the method.
         // <-start-
         if (null == name) throw new IllegalArgumentException("Name must be provided.");
-        Connection conn = getConnection();
         String insetSql = "INSERT INTO `todo_items` (name) VALUES (?)";
-        PreparedStatement preStat = conn.prepareStatement(insetSql);
-        preStat.setString(1, name);
-        preStat.executeUpdate();
         String querySql = "SELECT `id` FROM `todo_items` WHERE `name` =  ?";
-        preStat = conn.prepareStatement(querySql);
-        preStat.setString(1, name);
-        ResultSet rs = preStat.executeQuery();
-        Long id = -1L;
-        while (rs.next()) {
-            id = rs.getLong("id");
+        try (Connection conn = getConnection();
+             PreparedStatement preStat1 = conn.prepareStatement(insetSql);
+             PreparedStatement preStat2 = conn.prepareStatement(querySql);
+        ) {
+            preStat1.setString(1, name);
+            preStat1.executeUpdate();
+            preStat2.setString(1, name);
+            ResultSet rs = preStat2.executeQuery();
+            long id = -1L;
+            while (rs.next()) {
+                id = rs.getLong("id");
+            }
+            rs.close();
+            return id;
         }
-        return id;
         // --end-->
     }
 
     /**
      * Change item checked status to specified state.
      *
-     * @param id The item to update.
+     * @param id      The item to update.
      * @param checked The new checked status.
      * @return If the item exist returns true, otherwise returns false.
      */
@@ -50,18 +53,21 @@ public class TodoItemRepository {
         // TODO:
         //   Please implement the method.
         // <-start-
-        Connection con = getConnection();
         String querySql = "SELECT * FROM `todo_items` WHERE `id` = ?";
-        PreparedStatement preStat = con.prepareStatement(querySql);
-        preStat.setLong(1, id);
-        ResultSet rs = preStat.executeQuery();
-        if(!rs.next()) return false;
         String updateSql = "UPDATE `todo_items` SET `checked` = ? WHERE `id` = ?";
-        preStat = con.prepareStatement(updateSql);
-        preStat.setBoolean(1, checked);
-        preStat.setLong(2, id);
-        preStat.executeUpdate();
-        return true;
+        try (Connection con = getConnection();
+             PreparedStatement preStat1 = con.prepareStatement(querySql);
+             PreparedStatement preStat2 = con.prepareStatement(updateSql);
+        ) {
+            preStat1.setLong(1, id);
+            ResultSet rs = preStat1.executeQuery();
+            if (!rs.next()) return false;
+            rs.close();
+            preStat2.setBoolean(1, checked);
+            preStat2.setLong(2, id);
+            preStat2.executeUpdate();
+            return true;
+        }
         // --end-->
     }
 
@@ -75,20 +81,23 @@ public class TodoItemRepository {
         // TODO:
         //   Please implement the method.
         // <-start-
-        Connection conn = getConnection();
         String querySql = "SELECT * FROM `todo_items` WHERE `id` = ?";
-        PreparedStatement preStat = conn.prepareStatement(querySql);
-        preStat.setLong(1, id);
-        preStat.executeQuery();
-        ResultSet rs = preStat.getResultSet();
-        TodoItem res = null;
-        while (rs.next()) {
-            long idd = rs.getLong("id");
-            String name = rs.getString("name");
-            boolean checked = rs.getBoolean("checked");
-            res = new TodoItem(idd, name, checked);
+        try (Connection conn = getConnection();
+             PreparedStatement preStat = conn.prepareStatement(querySql);
+        ) {
+            preStat.setLong(1, id);
+            preStat.executeQuery();
+            ResultSet rs = preStat.getResultSet();
+            TodoItem res = null;
+            while (rs.next()) {
+                long idd = rs.getLong("id");
+                String name = rs.getString("name");
+                boolean checked = rs.getBoolean("checked");
+                res = new TodoItem(idd, name, checked);
+            }
+            rs.close();
+            return Optional.ofNullable(res);
         }
-        return Optional.ofNullable(res);
         // --end-->
     }
 
@@ -101,7 +110,7 @@ public class TodoItemRepository {
             Class.forName(configuration.getDriver());
             conn = DriverManager.getConnection(configuration.getUri(), configuration.getUsername(),
                     configuration.getPassword());
-        }catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             System.out.println(e);
         }
         return conn;
