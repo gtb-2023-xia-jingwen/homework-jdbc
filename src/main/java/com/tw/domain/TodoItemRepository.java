@@ -75,7 +75,20 @@ public class TodoItemRepository {
         // TODO:
         //   Please implement the method.
         // <-start-
-        throw new RuntimeException("Delete me");
+        Connection conn = getConnection();
+        String querySql = "SELECT * FROM `todo_items` WHERE `id` = ?";
+        PreparedStatement preStat = conn.prepareStatement(querySql);
+        preStat.setLong(1, id);
+        preStat.executeQuery();
+        ResultSet rs = preStat.getResultSet();
+        TodoItem res = null;
+        while (rs.next()) {
+            long idd = rs.getLong("id");
+            String name = rs.getString("name");
+            boolean checked = rs.getBoolean("checked");
+            res = new TodoItem(idd, name, checked);
+        }
+        return Optional.ofNullable(res);
         // --end-->
     }
 
