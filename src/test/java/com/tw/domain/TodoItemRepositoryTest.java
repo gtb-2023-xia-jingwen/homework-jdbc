@@ -6,12 +6,25 @@ import com.tw.dbTest.TestDatabaseConfiguration;
 import org.jooq.Record;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @InMemoryDbSupport
 class TodoItemRepositoryTest {
+
+    @Test
+    void should_connection() {
+        TodoItemRepository repository = new TodoItemRepository(
+                TestDatabaseConfiguration.getConfiguration());
+
+        Connection conn = repository.getConnection();
+
+        assertNotEquals(null, conn);
+    }
+
     @Test
     void should_create_todo_list_item() throws Exception {
         // Given
