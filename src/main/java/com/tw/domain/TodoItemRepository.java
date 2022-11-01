@@ -1,10 +1,8 @@
 package com.tw.domain;
 
 import java.io.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.net.URLDecoder;
+import java.sql.*;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -73,19 +71,5 @@ public class TodoItemRepository {
         }
         return conn;
     }
-
-    public void createTable() {
-        try(Connection con = getConnection()) {
-            Statement stat = con.createStatement();
-            BufferedReader bf = new BufferedReader(new FileReader("V001__create_todo_list_table.sql"));
-            String createSql = bf.readLine();
-            stat.execute(createSql);
-        }catch (SQLException e) {
-            System.out.println(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     // --end-->
 }
